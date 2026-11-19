@@ -1,0 +1,24 @@
+---
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="content-well-wide">
+    <div class="foot">
+      <p>© {year} Kyle Laverty · A <a href="https://crossfxn.com" target="_blank" rel="noopener">Crossfxn LLC<span class="visually-hidden"> (opens in a new tab)</span></a> site · Built with Astro and SmidgenCSS</p>
+      <ul class="foot__links">
+        <li><a href="https://github.com/lavekyl" target="_blank" rel="noopener">GitHub<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+        <li><a href="https://linkedin.com/in/lavekyl" target="_blank" rel="noopener">LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+        <li><a href="/resume">Résumé</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer{border-top:1px solid var(--space-3);padding:2.5rem 0;color:var(--paper-soft);font-size:.9rem}
+  .foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+  .foot p{margin:0}
+  .foot__links{display:flex;gap:1.25rem;list-style:none;margin:0;padding:0}
+  .site-footer a{color:var(--paper);text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:.3em}
+  .site-footer a:hover{color:var(--accent-hot)}
+</style>

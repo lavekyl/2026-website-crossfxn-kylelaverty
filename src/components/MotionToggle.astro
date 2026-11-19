@@ -1,0 +1,44 @@
+---
+// Visible pause/play for all decorative motion. Hidden when the OS already
+// asks for reduced motion, since nothing moves and there is nothing to pause.
+---
+<button type="button" class="motion-toggle" data-motion-toggle aria-pressed="false" hidden>
+  <svg class="motion-toggle__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+    <path class="is-pause" d="M6.5 4.5C6.4 8 6.6 12 6.5 15.5M13.5 4.5C13.3 8 13.6 12 13.5 15.5" />
+    <path class="is-play" d="M6 4C10 6.5 13 8.5 16 10C13 11.5 10 13.5 6 16C6.3 12 6.2 8 6 4Z" />
+  </svg>
+  <span>Pause animations</span>
+</button>
+
+<style is:global>
+  .motion-toggle{display:inline-flex;align-items:center;gap:.45rem;min-height:2.75rem;padding:.4rem .9rem;background:transparent;color:var(--paper);border:1.5px solid var(--space-3);border-radius:999px;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer}
+  .motion-toggle[hidden]{display:none}
+  .motion-toggle:hover{border-color:var(--accent);color:var(--accent-hot)}
+  .motion-toggle__icon{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .motion-toggle .is-play,
+  .motion-toggle[aria-pressed="true"] .is-pause{display:none}
+  .motion-toggle[aria-pressed="true"] .is-play{display:inline}
+</style>
+
+<script>
+  import { systemReduced, userPaused, setUserPaused } from "../scripts/motion";
+
+  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-motion-toggle]");
+  const sync = () => {
+    const hide = systemReduced();
+    const pressed = String(userPaused());
+    buttons.forEach((b) => {
+      b.hidden = hide;
+      b.setAttribute("aria-pressed", pressed);
+    });
+  };
+  buttons.forEach((b) =>
+    b.addEventListener("click", () => {
+      setUserPaused(!userPaused());
+      sync();
+    }),
+  );
+  window.addEventListener("motionchange", sync);
+  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", sync);
+  sync();
+</script>

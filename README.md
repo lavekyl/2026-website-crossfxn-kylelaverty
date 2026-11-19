@@ -1,68 +1,80 @@
-# Kyle Laverty — Personal Site
+# Kyle Laverty: Personal Site
 
-The source for [kylelaverty.com](https://kylelaverty.com): a fast, accessible, hand-coded single-page personal site. Plain HTML, CSS, and a little JavaScript, with layout handled by [SmidgenCSS](https://smidgencss.com). There is no build step.
+The source for [kylelaverty.com](https://kylelaverty.com). A portfolio and résumé built with [Astro](https://astro.build), laid out with [SmidgenCSS](https://smidgencss.com), and themed around a hand-drawn rocket launch. No Tailwind, no UI framework, no animation library.
 
-You are welcome to use this as a starting point for your own site. If you do, please make it genuinely yours by swapping in your own content and replacing the personal pieces listed below.
+## Run it
 
-## Files
-
-```
-index.html            the page itself: structure and content
-favicon.svg           the browser tab icon
-css/
-  smidgen.min.css     SmidgenCSS, the layout framework (vendored, do not edit)
-  style.css           all custom styling and the design tokens
-js/
-  main.js             the mobile navigation menu behavior
-og-image.png          the social share image (export from og-image.svg)
-README.md
-```
-
-## Run it locally
-
-No tooling required. You can open `index.html` directly in a browser, or serve the folder so paths resolve exactly as they will in production:
+Astro 7 needs Node 22.23.4 or newer (`.nvmrc` pins it).
 
 ```
-python3 -m http.server
+npm install
+npm run dev       # http://localhost:4321
+npm run build     # writes the static site to dist/
+npm run preview   # serves dist/ locally
 ```
 
-Then visit `http://localhost:8000`. The Live Server extension for VS Code works just as well.
+## Where things live
 
-## Make it yours
+```
+src/
+  content.config.ts         project schema + filter categories
+  content/projects/*.md     one file per project card
+  data/resume.ts            résumé content for /resume
+  layouts/Base.astro        head, SEO, JSON-LD, analytics, skip link, header/footer
+  components/
+    Starfield.astro         canvas starfield: 3 depth layers, twinkles, shooting stars
+    Rocket.astro            inked SVG rocket: draw-on, flame, scroll-linked launch
+    MotionToggle.astro      "Pause animations" button
+    ProjectCard.astro       one card in the work grid
+    ProjectFilter.astro     filter buttons for the work grid
+    Doodle.astro            small SVG doodles for section heads
+    Header.astro, Footer.astro
+  pages/index.astro, resume.astro, 404.astro
+  scripts/motion.ts         shared motion state (OS setting + pause toggle)
+  styles/
+    smidgen.min.css         SmidgenCSS, vendored, do not edit
+    tokens.css              colors, fonts, spacing
+    base.css, site.css      global styles
+    print.css               print layout for /resume
+public/
+  fonts/                    self-hosted woff2 files
+  pdf/                      downloadable résumé
+  og-image.png              social share image (1200×630)
+```
 
-There are three places to edit, in plain terms.
+## Add a project
 
-**1. Content and meta, in `index.html`.**
+Add a Markdown file to `src/content/projects/`. Only the frontmatter is used:
 
-- Replace the text in each section: hero, work, skills, about, and contact.
-- Update the `<title>` and the `<meta name="description">`.
-- Update the Open Graph and Twitter tags, the `<link rel="canonical">`, and the URLs inside them.
-- Replace the Google Analytics ID (`G-BHJXKZHLZX`) with your own, or remove the Google tag block entirely if you do not want analytics. Do not publish with my ID, or your visits will be counted in my account.
-- Update the structured data (the JSON-LD block) with your own name, role, and links, or remove it. As written it describes me, so it must be changed or deleted.
+```yaml
+---
+name: Project Name
+url: https://example.com
+description: "One line. What it is and who it's for."
+categories: [civic]            # civic, products, brands, open-source, client, publishing
+status: live                   # live, beta, in-development, or leave it out for no badge
+tags: [Astro, Cloudflare Pages]
+order: 170                     # lower shows first
+---
+```
 
-**2. Colors and type, in `css/style.css`.**
+The build fails if a field is missing or a category is misspelled.
 
-- The palette and a few sizing values live as CSS variables at the very top, in `:root`. Change `--red`, `--ink`, `--paper`, and the others in one place and the whole site follows.
-- The typefaces are set on the `body` rule and the `h1, h2, h3` rule.
+## Update the résumé
 
-**3. The share image.**
+Edit `src/data/resume.ts`, then replace the PDF in `public/pdf/`. If the PDF filename changes, update `pdf` in `resume.ts`. Print `/resume` to check it still fits on two pages.
 
-- Replace `og-image.png` with your own 1200×630 image, and update the `og:image` and `twitter:image` paths if you rename it.
+## Motion and accessibility
 
-## SmidgenCSS
-
-Layout, meaning the grid, the centered containers, and the vertical rhythm, is handled by [SmidgenCSS](https://smidgencss.com). The copy in `css/smidgen.min.css` is vendored, so there is nothing to install or fetch. Leave it as is and do your own styling in `style.css`.
-
-## A note on fonts
-
-For simplicity this page loads its fonts, Bricolage Grotesque and Hanken Grotesk, from Google Fonts. For a production site I prefer self-hosting them: download the woff2 files, place them in a `fonts/` folder, declare them with `@font-face` in `style.css`, and remove the Google Fonts `<link>` from `index.html`. That drops a third-party request and is both faster and more private.
+- Everything that moves is gated on `<html data-motion="on">`. An inline script in `Base.astro` sets it before first paint from the OS reduced-motion setting and the saved pause choice.
+- With reduced motion, nothing moves: a still starfield and a fully drawn rocket. The pause toggle hides itself because there is nothing to pause.
+- The launch uses CSS scroll-driven animations where supported. Browsers without them (Firefox today) get a small IntersectionObserver + scroll fallback in `Rocket.astro`.
+- The scroll-driven rules use longhand `animation-*` properties on purpose. The build's CSS minifier drops the `animation` shorthand when `animation-timeline` follows it.
 
 ## Deploy
 
-The site is static, so any static host works. You can drag the folder onto Netlify, or connect this repository to Netlify for automatic deploys on every push. No build command is needed; publish the repository root.
+Netlify builds from `netlify.toml`: `npm run build`, publish `dist/`. Any static host works with the same settings.
 
 ## License
 
-MIT. If you build on it, a link back is appreciated but not required.
-
-Built by hand by Kyle Laverty.
+MIT. If you build on it, swap in your own content, analytics ID and structured data first.

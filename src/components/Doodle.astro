@@ -1,0 +1,60 @@
+---
+// Small hand-drawn space doodles for section heads. Always decorative.
+interface Props {
+  kind: "orbit" | "moon" | "satellite" | "constellation";
+  label?: string;
+  class?: string;
+}
+const { kind, label, class: cls = "" } = Astro.props;
+---
+<div class:list={["doodle-mark", `doodle-mark--${kind}`, cls]} aria-hidden="true">
+  <svg viewBox="0 0 120 80" focusable="false">
+    <g filter="url(#ink)">
+      {kind === "orbit" && (
+        <>
+          <path class="dd" d="M60 22C72 22 80 30 80 40C80 51 71 58 60 58C49 58 40 50 40 40C40 30 48 22 61 23" />
+          <path class="dd dd--accent" d="M18 50C10 44 30 30 60 30C92 30 112 38 104 46C96 54 70 56 52 53" />
+          <path class="dd dd--thin" d="M48 30C52 34 50 40 46 42M66 44C70 46 72 50 70 54" />
+        </>
+      )}
+      {kind === "moon" && (
+        <>
+          <path class="dd" d="M70 14C54 16 44 30 46 44C48 60 64 70 80 64C68 62 58 52 58 38C58 28 62 20 70 14Z" />
+          <path class="dd dd--thin" d="M62 46C64 47 65 49 64 51M66 32C68 32 69 34 68 35" />
+          <path class="dd dd--accent" d="M92 22L94 28L100 30L94 32L92 38L90 32L84 30L90 28Z" />
+          <path class="dd dd--thin" d="M24 52L25 55L28 56L25 57L24 60L23 57L20 56L23 55Z" />
+        </>
+      )}
+      {kind === "satellite" && (
+        <>
+          <path class="dd" d="M52 32L68 32L68 48L52 48Z" />
+          <path class="dd dd--accent" d="M20 34L46 34L46 46L20 46ZM29 34L29 46M37 34L37 46M74 34L100 34L100 46L74 46ZM83 34L83 46M91 34L91 46" />
+          <path class="dd" d="M46 40L52 40M68 40L74 40M60 32L60 22M56 18C58 15 62 15 64 18" />
+          <path class="dd dd--thin" d="M70 58C74 62 74 68 70 72M78 56C84 62 84 70 78 76" />
+        </>
+      )}
+      {kind === "constellation" && (
+        <>
+          <path class="dd dd--thin" d="M12 58L34 38L58 46L80 20L106 30" stroke-dasharray="3 5" />
+          <circle class="dd-star" cx="12" cy="58" r="3" />
+          <circle class="dd-star" cx="34" cy="38" r="2.5" />
+          <circle class="dd-star" cx="58" cy="46" r="3.5" />
+          <circle class="dd-star dd-star--accent" cx="80" cy="20" r="3" />
+          <circle class="dd-star" cx="106" cy="30" r="2.5" />
+        </>
+      )}
+    </g>
+  </svg>
+  {label && <span class="doodle">{label}</span>}
+</div>
+
+<style is:global>
+  .doodle-mark{display:inline-flex;align-items:center;gap:.5rem;color:var(--paper-soft)}
+  .doodle-mark svg{width:5.5rem;height:auto;overflow:visible}
+  .doodle-mark .doodle{font-size:1.35rem;line-height:1;transform:rotate(-3deg)}
+  .dd{fill:none;stroke:var(--paper);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .dd--thin{stroke-width:1.3;opacity:.6}
+  .dd--accent{stroke:var(--accent)}
+  .dd-star{fill:var(--paper)}
+  .dd-star--accent{fill:var(--accent)}
+</style>

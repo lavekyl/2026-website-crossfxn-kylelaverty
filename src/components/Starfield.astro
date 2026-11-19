@@ -1,0 +1,217 @@
+---
+// Decorative starfield: three depth layers, a few twinkles, the odd shooting star.
+// Sits behind everything, never takes focus, and holds still when motion is off.
+---
+<canvas class="starfield" aria-hidden="true" data-starfield></canvas>
+
+<style is:global>
+  .starfield{position:fixed;inset:0;width:100%;height:100lvh;z-index:-1;pointer-events:none;opacity:0;transition:opacity .8s ease}
+  .starfield.is-ready{opacity:1}
+  :root[data-motion="off"] .starfield{transition:none}
+</style>
+
+<script>
+  import { motionOn } from "../scripts/motion";
+
+  type Star = { x: number; y: number; r: number; a: number; tw: number; ph: number; spark: boolean };
+  type Layer = { stars: Star[]; drift: number; parallax: number };
+  type Shooter = { x: number; y: number; vx: number; vy: number; life: number; ttl: number };
+
+  // density = stars per CSS px², drift = px per second, parallax = share of scroll distance.
+  const LAYERS = [
+    { density: 0.00011, r: [0.35, 0.8], a: [0.3, 0.55], drift: 1.5, parallax: 0.02 },
+    { density: 0.00004, r: [0.7, 1.2], a: [0.5, 0.8], drift: 4, parallax: 0.06 },
+    { density: 0.000012, r: [1.1, 1.8], a: [0.75, 1], drift: 8, parallax: 0.12 },
+  ];
+  const MAX_STARS = 420;
+  const MAX_PIXELS = 3_500_000; // backing-store cap: keeps memory sane on 4K and high-DPR screens
+  const FRAME_MS = 1000 / 30;   // 30 fps is plenty for a slow drift
+  const INK = "244,239,226";    // --paper
+  const FLAME = "255,178,122";  // --accent-hot
+
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-starfield]");
+  const ctx = canvas?.getContext("2d");
+
+  if (canvas && ctx) {
+    let W = 0;
+    let H = 0;
+    let layers: Layer[] = [];
+    let raf = 0;
+    let last = 0;
+    let elapsed = 0;
+    let shooter: Shooter | null = null;
+    let nextShot = 5 + Math.random() * 5;
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+    const wrap = (v: number, m: number) => ((v % m) + m) % m;
+
+    function seed() {
+      let budget = MAX_STARS;
+      layers = LAYERS.map((L, i) => {
+        const n = Math.min(budget, Math.round(W * H * L.density));
+        budget -= n;
+        const stars: Star[] = [];
+        for (let s = 0; s < n; s++) {
+          const twinkles = Math.random() < 0.08;
+          stars.push({
+            x: Math.random(),
+            y: Math.random(),
+            r: rand(L.r[0], L.r[1]),
+            a: rand(L.a[0], L.a[1]),
+            tw: twinkles ? rand(0.6, 1.6) : 0,
+            ph: rand(0, Math.PI * 2),
+            spark: i === 2 && twinkles,
+          });
+        }
+        return { stars, drift: L.drift, parallax: L.parallax };
+      });
+    }
+
+    function size() {
+      const w = window.innerWidth;
+      const h = Math.max(window.innerHeight, document.documentElement.clientHeight);
+      const reseed = w !== W || !layers.length;
+      W = w;
+      H = h;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (W * H * dpr * dpr > MAX_PIXELS) dpr = Math.sqrt(MAX_PIXELS / (W * H));
+      canvas!.width = Math.round(W * dpr);
+      canvas!.height = Math.round(H * dpr);
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (reseed) seed(); // positions are normalized, so a height-only change needs no reseed
+    }
+
+    function draw(time: number, moving: boolean) {
+      ctx!.clearRect(0, 0, W, H);
+      const sy = moving ? window.scrollY : 0;
+      for (const L of layers) {
+        const ox = moving ? time * L.drift : 0;
+        const oy = -sy * L.parallax;
+        for (const s of L.stars) {
+          const x = wrap(s.x * W + ox, W);
+          const y = wrap(s.y * H + oy, H);
+          let a = s.a;
+          if (s.tw && moving) a *= 0.55 + 0.45 * Math.sin(time * s.tw * 2 + s.ph);
+          ctx!.fillStyle = `rgba(${INK},${a.toFixed(3)})`;
+          if (s.r < 0.9) {
+            ctx!.fillRect(x, y, s.r * 2, s.r * 2);
+          } else {
+            ctx!.beginPath();
+            ctx!.arc(x, y, s.r, 0, Math.PI * 2);
+            ctx!.fill();
+          }
+          if (s.spark) {
+            // a small inked cross, like a pen flick
+            const k = s.r * 3.2 * (0.7 + 0.3 * a);
+            ctx!.strokeStyle = `rgba(${INK},${(a * 0.7).toFixed(3)})`;
+            ctx!.lineWidth = 0.8;
+            ctx!.beginPath();
+            ctx!.moveTo(x - k, y);
+            ctx!.lineTo(x + k, y);
+            ctx!.moveTo(x, y - k);
+            ctx!.lineTo(x, y + k);
+            ctx!.stroke();
+          }
+        }
+      }
+      if (moving && shooter) drawShooter(shooter);
+    }
+
+    function drawShooter(s: Shooter) {
+      const p = s.life / s.ttl;
+      const fade = p < 0.2 ? p / 0.2 : 1 - (p - 0.2) / 0.8;
+      const len = Math.hypot(s.vx, s.vy);
+      const tx = s.x - (s.vx / len) * 110;
+      const ty = s.y - (s.vy / len) * 110;
+      const g = ctx!.createLinearGradient(s.x, s.y, tx, ty);
+      g.addColorStop(0, `rgba(${INK},${(0.9 * fade).toFixed(3)})`);
+      g.addColorStop(0.3, `rgba(${FLAME},${(0.35 * fade).toFixed(3)})`);
+      g.addColorStop(1, `rgba(${FLAME},0)`);
+      ctx!.strokeStyle = g;
+      ctx!.lineWidth = 1.4;
+      ctx!.lineCap = "round";
+      ctx!.beginPath();
+      ctx!.moveTo(s.x, s.y);
+      ctx!.lineTo(tx, ty);
+      ctx!.stroke();
+    }
+
+    function step(dt: number) {
+      if (shooter) {
+        shooter.life += dt;
+        shooter.x += shooter.vx * dt;
+        shooter.y += shooter.vy * dt;
+        if (shooter.life >= shooter.ttl) shooter = null;
+        return;
+      }
+      nextShot -= dt;
+      if (nextShot > 0) return;
+      const fromLeft = Math.random() < 0.5;
+      const speed = rand(520, 760);
+      const angle = rand(0.25, 0.5); // radians below horizontal
+      shooter = {
+        x: fromLeft ? rand(0, W * 0.5) : rand(W * 0.5, W),
+        y: rand(0, H * 0.4),
+        vx: Math.cos(angle) * speed * (fromLeft ? 1 : -1),
+        vy: Math.sin(angle) * speed,
+        life: 0,
+        ttl: rand(0.7, 1.1),
+      };
+      nextShot = rand(9, 18);
+    }
+
+    function frame(now: number) {
+      raf = requestAnimationFrame(frame);
+      if (now - last < FRAME_MS) return;
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+      elapsed += dt;
+      step(dt);
+      draw(elapsed, true);
+    }
+
+    function start() {
+      if (raf || document.hidden || !motionOn()) return;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+
+    function stop() {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
+
+    function still() {
+      stop();
+      shooter = null;
+      draw(0, false);
+    }
+
+    function boot() {
+      size();
+      if (motionOn()) start();
+      else still();
+      canvas!.classList.add("is-ready");
+
+      let resizeTimer = 0;
+      window.addEventListener(
+        "resize",
+        () => {
+          clearTimeout(resizeTimer);
+          resizeTimer = window.setTimeout(() => {
+            size();
+            if (!raf) draw(elapsed, false);
+          }, 150);
+        },
+        { passive: true },
+      );
+      document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+      window.addEventListener("motionchange", () => (motionOn() ? start() : still()));
+    }
+
+    // Lazy start: never compete with first paint or the LCP element.
+    const idle = (cb: () => void) =>
+      "requestIdleCallback" in window ? window.requestIdleCallback(cb, { timeout: 1500 }) : window.setTimeout(cb, 300);
+    if (document.readyState === "complete") idle(boot);
+    else window.addEventListener("load", () => idle(boot), { once: true });
+  }
+</script>

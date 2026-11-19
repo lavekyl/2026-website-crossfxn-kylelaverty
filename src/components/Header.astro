@@ -1,0 +1,94 @@
+---
+import MotionToggle from "./MotionToggle.astro";
+
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const links = [
+  { href: "/#work", label: "Work" },
+  { href: "/#crossfxn", label: "Crossfxn" },
+  { href: "/#about", label: "About" },
+  { href: "/resume", label: "Résumé", current: path === "/resume" },
+  { href: "/#contact", label: "Contact" },
+];
+---
+<header class="site-header">
+  <div class="content-well-wide">
+    <div class="bar">
+      <a href="/" class="wordmark" aria-label="Kyle Laverty, home">Kyle Laverty<span class="dot" aria-hidden="true">.</span></a>
+      <div class="bar__right">
+        <MotionToggle />
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+          <span class="bars" aria-hidden="true"></span>
+          <span class="visually-hidden">Menu</span>
+        </button>
+        <nav class="primary" id="primary-nav" aria-label="Primary">
+          <ul>
+            {links.map((l) => (
+              <li><a href={l.href} aria-current={l.current ? "page" : undefined}>{l.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style is:global>
+  .site-header{position:sticky;top:0;z-index:30;background:rgba(10,15,30,.86);border-bottom:1px solid var(--space-3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .site-header .bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:var(--header-h);position:relative}
+  .bar__right{display:flex;align-items:center;gap:1.25rem}
+  .wordmark{font-family:var(--font-display);font-weight:800;font-size:1.25rem;letter-spacing:-.03em;text-decoration:none;color:var(--paper)}
+  .wordmark:hover{color:var(--paper)}
+  .wordmark .dot{color:var(--accent)}
+  nav.primary ul{display:flex;gap:1.5rem;align-items:center;list-style:none;margin:0;padding:0}
+  nav.primary a{display:inline-block;padding:.5rem 0;text-decoration:none;font-weight:600;font-size:.95rem;color:var(--paper)}
+  nav.primary a:hover,nav.primary a[aria-current="page"]{color:var(--accent-hot)}
+  nav.primary a[aria-current="page"]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.35em}
+
+  .nav-toggle{display:none;width:2.75rem;height:2.75rem;align-items:center;justify-content:center;border:1.5px solid var(--space-3);border-radius:8px;background:transparent;cursor:pointer;padding:0}
+  .nav-toggle .bars,.nav-toggle .bars::before,.nav-toggle .bars::after{display:block;width:1.25rem;height:2px;background:var(--paper);transition:transform .2s ease,background-color .2s ease}
+  .nav-toggle .bars{position:relative}
+  .nav-toggle .bars::before{content:"";position:absolute;left:0;top:-6px}
+  .nav-toggle .bars::after{content:"";position:absolute;left:0;top:6px}
+  .nav-toggle[aria-expanded="true"] .bars{background:transparent}
+  .nav-toggle[aria-expanded="true"] .bars::before{transform:translateY(6px) rotate(45deg)}
+  .nav-toggle[aria-expanded="true"] .bars::after{transform:translateY(-6px) rotate(-45deg)}
+  :root[data-motion="off"] .nav-toggle .bars,:root[data-motion="off"] .nav-toggle .bars::before,:root[data-motion="off"] .nav-toggle .bars::after{transition:none}
+
+  @media (max-width:56em){
+    .nav-toggle{display:inline-flex}
+    nav.primary{display:none;position:absolute;top:calc(100% + 1px);right:0;min-width:13rem;background:var(--space-2);border:1px solid var(--space-3);border-radius:10px;padding:.4rem;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+    nav.primary.open{display:block}
+    nav.primary ul{flex-direction:column;align-items:stretch;gap:0}
+    nav.primary a{display:block;padding:.8rem 1rem;font-size:1rem}
+    nav.primary li+li{border-top:1px solid var(--space-3)}
+  }
+  @media (max-width:30em){
+    .bar__right{gap:.6rem}
+    .site-header .motion-toggle span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    .site-header .motion-toggle{padding:.4rem .75rem}
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>(".nav-toggle");
+  const menu = document.getElementById("primary-nav");
+  if (toggle && menu) {
+    const set = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      menu.classList.toggle("open", open);
+    };
+    toggle.addEventListener("click", () => set(toggle.getAttribute("aria-expanded") !== "true"));
+    // Close after choosing a link, so the page scrolls to the anchor unobscured.
+    menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => set(false)));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && menu.classList.contains("open")) {
+        set(false);
+        toggle.focus();
+      }
+    });
+    document.addEventListener("click", (e) => {
+      const t = e.target as Node;
+      if (menu.classList.contains("open") && !menu.contains(t) && !toggle.contains(t)) set(false);
+    });
+  }
+</script>

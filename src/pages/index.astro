@@ -1,0 +1,157 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Rocket from "../components/Rocket.astro";
+import Doodle from "../components/Doodle.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ProjectFilter from "../components/ProjectFilter.astro";
+
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+const counts: Record<string, number> = {};
+for (const p of projects) for (const c of p.data.categories) counts[c] = (counts[c] ?? 0) + 1;
+
+const ext = { target: "_blank", rel: "noopener" } as const;
+const toolkit = ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Vue", "SvelteKit", "Next.js", "Astro", "WordPress", "PHP", "Node.js", "Fastify", "Supabase", "Sass", "Tailwind CSS", "Vite", "Webpack", "Git", "GitHub Actions", "Netlify", "Cloudflare", "AWS", "Azure", "Figma"];
+const outside = ["Time with my family", "Lifting, walking and boxing", "Reading about history", "American History Tellers", "Pittsburgh Pirates baseball", "Learning French on Duolingo", "A wide range of music", "Jeopardy and beach trips"];
+---
+<Base
+  title="Kyle Laverty | Senior Web Developer and U.S. Air Force Veteran"
+  description="Senior web developer and U.S. Air Force veteran. Thirteen years building fast, accessible, maintainable websites and applications, plus civic tools, products and brands under Crossfxn LLC."
+>
+  <section class="hero section" data-launch-scope aria-labelledby="hero-title">
+    <div class="content-wrapper">
+      <div class="content-well-wide hero__grid">
+        <div class="hero__copy">
+          <p class="eyebrow"><b>Senior Web Developer</b> · U.S. Air Force Veteran</p>
+          <h1 id="hero-title">Websites built to <span class="hl">last.</span></h1>
+          <p class="lede">
+            Thirteen years building fast, accessible, maintainable sites and applications, with the discipline I
+            learned <b>keeping fighter aircraft in the air.</b>
+          </p>
+          <p class="sub">
+            By day I build healthcare sites at Fingerpaint Medical. On my own time I ship civic data tools, apps,
+            brands and open-source code under Crossfxn LLC.
+          </p>
+          <div class="actions">
+            <a href="#work" class="btn">See my work</a>
+            <a href="/resume" class="btn btn--ghost">Résumé</a>
+            <a href="#contact" class="btn btn--ghost">Contact</a>
+          </div>
+          <ul class="hero__links">
+            <li><a href="https://github.com/lavekyl" {...ext}>GitHub<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+            <li><a href="https://linkedin.com/in/lavekyl" {...ext}>LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          </ul>
+        </div>
+        <div class="hero__art">
+          <Rocket />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="work" aria-labelledby="work-title">
+    <div class="content-wrapper">
+      <div class="content-well-wide">
+        <div class="section-head">
+          <div>
+            <h2 id="work-title">Things I've built.</h2>
+            <p>Live sites, betas and works in progress. All of it built and run under Crossfxn LLC.</p>
+          </div>
+          <Doodle kind="constellation" label="mission manifest" />
+        </div>
+        <ProjectFilter target="project-grid" counts={counts} total={projects.length} />
+        <ul class="pgrid flex-grid with-gutters" id="project-grid" role="list">
+          {projects.map((p) => (
+            <ProjectCard project={p} />
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="crossfxn" aria-labelledby="cfx-title">
+    <div class="content-wrapper">
+      <div class="content-well-wide">
+        <div class="section-head">
+          <h2 id="cfx-title">Crossfxn LLC.</h2>
+          <Doodle kind="orbit" label="home base" />
+        </div>
+        <div class="cfx">
+          <div class="cfx__body">
+            <p>
+              Crossfxn is my media and technology company. Every project above lives under it, from civic data tools to
+              apparel. I design them, build them, ship them and keep them running.
+            </p>
+            <p>
+              Creative Vets is the veteran-owned web shop inside Crossfxn. That's where client work happens: WordPress
+              builds, site rescue and security incident response, accessibility audits, and care plans.
+            </p>
+            <div class="actions">
+              <a href="https://crossfxn.com" class="btn" {...ext}>Visit Crossfxn<span class="visually-hidden"> (opens in a new tab)</span></a>
+              <a href="https://creativevets.com" class="btn btn--ghost" {...ext}>Visit Creative Vets<span class="visually-hidden"> (opens in a new tab)</span></a>
+            </div>
+          </div>
+          <figure class="cfx__quote">
+            <blockquote><p>Media and technology brands, built independently.</p></blockquote>
+            <figcaption>The line on crossfxn.com</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section about" id="about" aria-labelledby="about-title">
+    <div class="content-wrapper">
+      <div class="content-well-wide">
+        <div class="section-head">
+          <h2 id="about-title">More about me.</h2>
+          <Doodle kind="moon" />
+        </div>
+        <div class="about__grid">
+          <div class="narrative">
+            <p class="meta">Senior Web Developer at Fingerpaint Medical</p>
+            <p>
+              I build fast, dependable sites for the healthcare industry, where clarity, accessibility and reliability
+              aren't optional. I hold a B.S. in Information Sciences and Technology from Penn State.
+            </p>
+            <h3>My approach</h3>
+            <p>
+              Functional, fast, accessible and easy to maintain. I like digging into hard problems and finding the
+              clear, efficient fix that gets it right the first time.
+            </p>
+            <h3>Where the discipline comes from</h3>
+            <p>
+              I was a fighter aircraft crew chief in the U.S. Air Force. When someone is about to fly a multi-million
+              dollar aircraft you worked on, every detail matters. I hold my code to the same standard.
+            </p>
+          </div>
+          <div>
+            <div class="panel">
+              <h3>Outside of code</h3>
+              <ul class="enjoy">{outside.map((o) => <li>{o}</li>)}</ul>
+            </div>
+            <div class="panel">
+              <h3>Toolkit</h3>
+              <ul class="chips">{toolkit.map((t) => <li>{t}</li>)}</ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact" id="contact" aria-labelledby="contact-title">
+    <div class="content-wrapper">
+      <div class="content-well-wide">
+        <Doodle kind="satellite" label="open channel" />
+        <h2 id="contact-title">Let's build something that lasts.</h2>
+        <p>I'm open to new challenges, from complex applications to fast marketing sites.</p>
+        <div class="actions">
+          <a href="mailto:kyle@crossfxn.com" class="btn contact__mail">kyle@crossfxn.com</a>
+          <a href="https://linkedin.com/in/lavekyl" class="btn btn--ghost" {...ext}>LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a>
+          <a href="https://github.com/lavekyl" class="btn btn--ghost" {...ext}>GitHub<span class="visually-hidden"> (opens in a new tab)</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

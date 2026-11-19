@@ -1,0 +1,75 @@
+/* Site components. Layout comes from SmidgenCSS; this file covers look and feel. */
+main:focus{outline:none}
+.section{position:relative}
+.section + .section{border-top:1px solid var(--space-3)}
+.eyebrow{margin:0;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.12em;color:var(--paper-soft)}
+.eyebrow b{color:var(--paper);font-weight:700}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem 2rem;margin-bottom:2rem}
+.section-head h2{font-weight:800;font-size:clamp(2.1rem,4.6vw,3.4rem)}
+.section-head p{margin:.75rem 0 0;max-width:48ch;color:var(--paper-soft);font-size:1.1rem}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:3rem;text-decoration:none;font-weight:700;font-size:1rem;padding:.8rem 1.4rem;border-radius:999px;background:var(--accent);color:var(--space);border:2px solid var(--accent)}
+.btn:hover{background:var(--accent-hot);border-color:var(--accent-hot);color:var(--space)}
+.btn--ghost{background:transparent;color:var(--paper);border-color:var(--paper)}
+.btn--ghost:hover{background:var(--paper);border-color:var(--paper);color:var(--space)}
+.actions{display:flex;flex-wrap:wrap;gap:.85rem;align-items:center}
+
+/* hero */
+.hero{min-height:calc(100svh - var(--header-h));display:flex;align-items:center;--wrapper-padding:3rem}
+.hero .content-wrapper{width:100%}
+.hero__grid{display:flex;align-items:center;justify-content:space-between;gap:2rem 3rem}
+.hero__copy{flex:1 1 34rem;min-width:0}
+.hero h1{font-weight:800;font-size:clamp(3rem,8.6vw,7rem);line-height:.94;letter-spacing:-.045em;margin-top:1.25rem;max-width:11ch}
+.hero h1 .hl{color:var(--accent)}
+.hero .lede{font-size:clamp(1.15rem,1.8vw,1.35rem);max-width:44ch;margin-top:1.75rem;color:var(--paper-soft)}
+.hero .lede b{color:var(--paper);font-weight:600}
+.hero .sub{max-width:52ch;margin-top:1rem;color:var(--paper-soft)}
+.hero .actions{margin-top:2.25rem}
+.hero__links{display:flex;flex-wrap:wrap;gap:1.4rem;margin:1.75rem 0 0;padding:0;list-style:none}
+.hero__links a{font-weight:600;font-size:.95rem;color:var(--paper);text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:.3em}
+.hero__links a:hover{color:var(--accent-hot)}
+.hero__art{flex:none;display:flex;justify-content:center;padding-right:clamp(0rem,3vw,3rem)}
+@media (max-width:47.99em){
+  .hero{min-height:0}
+  .hero__grid{flex-direction:column;align-items:flex-start}
+  .hero__art{align-self:center;padding:0}
+}
+
+/* project grid */
+.pgrid{margin:0;padding:0}
+
+/* crossfxn */
+.cfx{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:2.5rem;align-items:start}
+.cfx__body p{font-size:1.1rem;max-width:56ch}
+.cfx__body p + p{margin-top:1rem}
+.cfx__quote{margin:0;padding:1.75rem;border:1px dashed var(--space-3);border-radius:14px;background:rgba(17,25,51,.6)}
+.cfx__quote p{font-family:var(--font-doodle);font-weight:600;font-size:2rem;line-height:1.1;color:var(--paper)}
+.cfx__quote figcaption{margin-top:.75rem;font-size:.9rem;color:var(--paper-soft)}
+.cfx .actions{margin-top:1.75rem}
+@media (max-width:47.99em){.cfx{grid-template-columns:1fr}}
+
+/* about */
+.about__grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:2.5rem 3rem;align-items:start}
+.about .meta{margin:0;font-weight:700;color:var(--accent);font-size:.9rem;text-transform:uppercase;letter-spacing:.08em}
+.about .narrative p{font-size:1.1rem;max-width:56ch;margin-top:1rem}
+.about h3{font-weight:700;font-size:1.35rem;letter-spacing:-.01em;margin-top:2rem}
+.panel{padding:1.6rem;border:1px solid var(--space-3);border-radius:14px;background:rgba(17,25,51,.72)}
+.panel + .panel{margin-top:1.25rem}
+.panel h3{margin-top:0;font-size:1.2rem}
+.enjoy{list-style:none;margin:1rem 0 0;padding:0}
+.enjoy li{display:flex;gap:.6rem;align-items:baseline;padding:.5rem 0;border-bottom:1px solid var(--space-3)}
+.enjoy li:last-child{border-bottom:0}
+.enjoy li::before{content:"✦";color:var(--accent);font-size:.8rem}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem;list-style:none;margin:1rem 0 0;padding:0}
+.chips li{font-size:.85rem;font-weight:600;padding:.3rem .7rem;border-radius:999px;border:1px solid var(--space-3)}
+@media (max-width:47.99em){.about__grid{grid-template-columns:1fr}}
+
+/* contact */
+.contact{--wrapper-padding:6rem;text-align:left}
+.contact h2{font-weight:800;font-size:clamp(2.4rem,6vw,4.6rem);max-width:15ch}
+.contact p{font-size:1.2rem;max-width:44ch;margin-top:1.25rem;color:var(--paper-soft)}
+.contact .actions{margin-top:2rem}
+.contact__mail{font-weight:700}
+
+@media (max-width:47.99em){:root{--wrapper-padding:3.25rem}}
