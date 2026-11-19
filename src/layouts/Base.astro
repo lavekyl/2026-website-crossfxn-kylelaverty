@@ -46,6 +46,17 @@ const jsonLd = {
       knowsAbout: ["Web development", "Accessibility", "Section 508", "WordPress", "Astro", "SvelteKit", "TypeScript", "Web performance"],
     },
     {
+      "@type": "WebSite",
+      "@id": "https://kylelaverty.com/#site",
+      url: "https://kylelaverty.com",
+      name: "Kyle Laverty",
+      publisher: { "@id": "https://kylelaverty.com/#kyle" },
+    },
+    // The home page is Kyle's profile page; Google uses this for name and image.
+    ...(path === "/"
+      ? [{ "@type": "ProfilePage", "@id": "https://kylelaverty.com/#profile", url: canonical, mainEntity: { "@id": "https://kylelaverty.com/#kyle" } }]
+      : []),
+    {
       "@type": "Organization",
       "@id": "https://crossfxn.com/#org",
       name: "Crossfxn LLC",
@@ -76,6 +87,7 @@ const jsonLd = {
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#0a0f1e" />
+    <link rel="sitemap" href="/sitemap.xml" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

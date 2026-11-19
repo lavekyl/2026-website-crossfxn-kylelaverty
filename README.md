@@ -94,6 +94,8 @@ When the PDF changes, replace the file in `public/pdf/`. If its name changes, up
 
 Netlify builds from `netlify.toml`: `npm run build`, publish `dist/`. Any static host works with the same settings.
 
+SEO: `public/robots.txt` points crawlers to `/sitemap.xml`, which is built from the list in `src/pages/sitemap.xml.ts`. Add a path there when you add a page. Pages build as `name.html` (`build.format: "file"`) so `/resume` is served directly with no trailing-slash redirect.
+
 ## License
 
 MIT. If you build on it, swap in your own content, analytics ID and structured data first.

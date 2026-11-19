@@ -15,3 +15,9 @@
   for = "/_astro/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# /resume used to build as /resume/. Send anyone with the old URL to the new one.
+[[redirects]]
+  from = "/resume/"
+  to = "/resume"
+  status = 301
