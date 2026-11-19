@@ -51,7 +51,8 @@ src/
 public/
   fonts/                    self-hosted woff2 files
   pdf/                      downloadable résumé
-  og-image.png              social share image (1200×630)
+  og-image.png              social share image (1200×630); bump ?v= in Base.astro when it changes
+  favicon.svg               master icon; favicon.ico, favicon.png and apple-touch-icon.png are rendered from it
 ```
 
 ## Add a project
