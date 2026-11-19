@@ -31,7 +31,7 @@ npm run preview   # serves dist/ locally
 src/
   content.config.ts         project schema + filter categories
   content/projects/*.md     one file per project card
-  data/resume.ts            résumé content for /resume
+  data/resume.md            résumé content for /resume (plain Markdown)
   layouts/Base.astro        head, SEO, JSON-LD, analytics, skip link, header/footer
   components/
     Starfield.astro         canvas starfield: 3 depth layers, twinkles, shooting stars
@@ -75,7 +75,13 @@ The build fails if a field is missing or a category is misspelled.
 
 ## Update the résumé
 
-Edit `src/data/resume.ts`, then replace the PDF in `public/pdf/`. If the PDF filename changes, update `pdf` in `resume.ts`. Print `/resume` to check it still fits on two pages.
+The résumé is plain Markdown in `src/data/resume.md`. You can edit it in any editor, or in the browser on GitHub (press `.` on the repo, or use the pencil icon on the file).
+
+- Links are standard Markdown: `[belotero.com](https://belotero.com)`. Links to other sites open in a new tab and tell screen readers they do.
+- Keep the shape: `##` for sections, `###` for each job written as `Company | Place | Role`, the dates on the next line, then bullets.
+- The `|` separators are hidden from screen readers automatically.
+
+When the PDF changes, replace the file in `public/pdf/`. If its name changes, update `PDF` at the top of `src/pages/resume.astro`. Print `/resume` to check it still fits on two pages.
 
 ## Motion and accessibility
 

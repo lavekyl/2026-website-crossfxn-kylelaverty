@@ -1,7 +1,22 @@
 ---
+// The résumé lives in src/data/resume.md so it can be edited anywhere,
+// including GitHub's web editor. This page only styles it and tidies the markup:
+//   - "|" separators in headings and lines are hidden from screen readers
+//   - links to other sites open in a new tab and say so to screen readers
 import Base from "../layouts/Base.astro";
-import { resume as r } from "../data/resume";
+import * as resume from "../data/resume.md";
 import "../styles/print.css";
+
+const PDF = "/pdf/KyleLaverty_Resume_2026.pdf";
+
+let html = await resume.compiledContent();
+html = html
+  // Hide the visual pipe separators from assistive tech.
+  .replace(/ \| /g, ' <span class="sep" aria-hidden="true">|</span> ')
+  // External links: new tab, announced.
+  .replace(/<a href="(https?:\/\/[^"]+)">(.*?)<\/a>/g, (_m, href, text) =>
+    `<a href="${href}" target="_blank" rel="noopener">${text}<span class="visually-hidden"> (opens in a new tab)</span></a>`,
+  );
 ---
 <Base
   title="Résumé | Kyle Laverty, Senior Web Developer"
@@ -11,65 +26,10 @@ import "../styles/print.css";
   <div class="content-wrapper">
     <div class="content-well resume-page">
       <div class="resume-tools">
-        <a class="btn" href={r.pdf} download>Download PDF</a>
+        <a class="btn" href={PDF} download>Download PDF</a>
         <button class="btn btn--ghost" type="button" data-print hidden>Print</button>
       </div>
-
-      <article class="resume" aria-labelledby="resume-name">
-        <header class="resume__head">
-          <h1 id="resume-name">{r.name}</h1>
-          <p class="resume__headline">{r.headline}</p>
-          <ul class="resume__contact">
-            {r.contact.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : c.label}</li>)}
-          </ul>
-        </header>
-
-        <section aria-labelledby="r-summary">
-          <h2 id="r-summary">Professional Summary</h2>
-          <p>{r.summary}</p>
-        </section>
-
-        <section aria-labelledby="r-exp">
-          <h2 id="r-exp">Experience</h2>
-          {r.experience.map((j) => (
-            <div class="job">
-              <h3><span class="job__org">{j.org}</span> <span class="job__sep" aria-hidden="true">|</span> {j.place} <span class="job__sep" aria-hidden="true">|</span> {j.role}</h3>
-              <p class="job__dates">{j.dates}</p>
-              <ul>{j.points.map((pt) => <li>{pt}</li>)}</ul>
-            </div>
-          ))}
-        </section>
-
-        <section aria-labelledby="r-ind">
-          <h2 id="r-ind">Independent Projects &amp; Freelance</h2>
-          {r.independent.map((j) => (
-            <div class="job">
-              <h3><span class="job__org">{j.org}</span> <span class="job__sep" aria-hidden="true">|</span> {j.place} <span class="job__sep" aria-hidden="true">|</span> {j.role}</h3>
-              <p class="job__dates">{j.dates}</p>
-              <ul>{j.points.map((pt) => <li>{pt}</li>)}</ul>
-            </div>
-          ))}
-        </section>
-
-        <section aria-labelledby="r-skills">
-          <h2 id="r-skills">Technical Skills</h2>
-          <dl class="skills">
-            {r.skills.map((s) => (
-              <div><dt>{s.label}:</dt> <dd>{s.items}</dd></div>
-            ))}
-          </dl>
-        </section>
-
-        <section aria-labelledby="r-edu">
-          <h2 id="r-edu">Education</h2>
-          {r.education.map((e) => <p class="line"><strong>{e.org}</strong> | {e.detail} | {e.dates}</p>)}
-        </section>
-
-        <section aria-labelledby="r-mil">
-          <h2 id="r-mil">Military Service</h2>
-          {r.service.map((e) => <p class="line"><strong>{e.org}</strong> | {e.detail} | {e.dates}</p>)}
-        </section>
-      </article>
+      <article class="resume" aria-labelledby="kyle-laverty" set:html={html} />
     </div>
   </div>
 </Base>
@@ -78,25 +38,24 @@ import "../styles/print.css";
   .resume-page{--wrapper-padding:3rem}
   .resume-tools{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:flex-end;margin-bottom:1.5rem}
   .resume{background:var(--paper);color:#1b1a17;border-radius:6px;padding:clamp(1.5rem,5vw,3.5rem);box-shadow:0 30px 80px -30px rgba(0,0,0,.7);font-size:1rem;line-height:1.5}
-  .resume a{color:#1b1a17;text-decoration-color:#b5541a}
-  .resume a:hover{color:#8a3a0c}
-  .resume__head h1{font-size:clamp(2rem,5vw,2.8rem);font-weight:800;letter-spacing:-.03em}
-  .resume__headline{margin:.25rem 0 0;font-weight:600;color:#4a4740}
-  .resume__contact{display:flex;flex-wrap:wrap;gap:.25rem 1rem;list-style:none;margin:.75rem 0 0;padding:0;font-size:.92rem;color:#4a4740}
+  .resume a{color:#1b1a17;text-decoration:underline;text-decoration-color:#b5541a;text-decoration-thickness:1.5px;text-underline-offset:.2em}
+  .resume a:hover{color:#8a3a0c;text-decoration-thickness:2.5px}
+  .resume a:focus-visible{outline:3px solid #b5541a;outline-offset:2px}
+  .resume .sep{color:#6b675e;margin:0 .1rem}
+
+  /* name, headline, contact row */
+  .resume > h1{font-size:clamp(2rem,5vw,2.8rem);font-weight:800;letter-spacing:-.03em}
+  .resume > h1 + p{margin:.25rem 0 0;font-weight:600;color:#4a4740}
+  .resume > h1 + p + ul{display:flex;flex-wrap:wrap;gap:.25rem 1rem;list-style:none;margin:.75rem 0 0;padding:0;font-size:.92rem;color:#4a4740}
+
+  /* sections */
   .resume h2{font-family:var(--font-body);font-size:1.05rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:2rem;padding-bottom:.35rem;border-bottom:2px solid #1b1a17}
-  .resume section > p{margin-top:.75rem}
-  .job{margin-top:1.1rem;break-inside:avoid}
-  .job h3{font-family:var(--font-body);font-size:1.02rem;font-weight:600;letter-spacing:0;line-height:1.35}
-  .job__org{font-weight:700}
-  .job__sep{color:#6b675e;margin:0 .15rem}
-  .job__dates{margin:.1rem 0 0;font-size:.9rem;color:#4a4740}
-  .job ul{margin:.45rem 0 0;padding-left:1.2rem}
-  .job li + li{margin-top:.3rem}
-  .skills{margin:.75rem 0 0}
-  .skills div + div{margin-top:.45rem}
-  .skills dt{display:inline;font-weight:700}
-  .skills dd{display:inline;margin:0}
-  .resume .line{margin-top:.75rem}
+  .resume h2 + p{margin-top:.75rem}
+  .resume h3{font-family:var(--font-body);font-size:1.02rem;font-weight:600;letter-spacing:0;line-height:1.35;margin-top:1.1rem}
+  .resume h3 + p{margin:.1rem 0 0;font-size:.9rem;color:#4a4740}
+  .resume h3 ~ ul{margin:.45rem 0 0;padding-left:1.2rem}
+  .resume h3 ~ ul li + li{margin-top:.3rem}
+  .resume h2 ~ p:has(> strong:first-child){margin-top:.5rem}
 </style>
 
 <script>
