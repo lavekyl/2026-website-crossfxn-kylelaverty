@@ -1,0 +1,221 @@
+---
+// Hand-inked rocket. Draws itself on load, idles with a small flame,
+// then launches as the hero scrolls away.
+// Needs an ancestor with [data-launch-scope] (the hero): that element
+// owns the scroll timeline the launch follows.
+interface Props {
+  label?: boolean;
+}
+const { label = true } = Astro.props;
+---
+<div class="rkt" data-rocket aria-hidden="true">
+  <svg class="rkt__defs" width="0" height="0" focusable="false">
+    <defs>
+      <!-- line wobble (#ink) lives in Base.astro. Three noise seeds = three "boiling" frames for the flame -->
+      <filter id="rkt-boil-1" x="-20%" y="-10%" width="140%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="1" /><feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G" /></filter>
+      <filter id="rkt-boil-2" x="-20%" y="-10%" width="140%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="7" /><feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G" /></filter>
+      <filter id="rkt-boil-3" x="-20%" y="-10%" width="140%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="13" /><feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G" /></filter>
+      <clipPath id="rkt-hull"><path d="M100 16C84 36 66 74 63 116C61 150 62 186 63 214C64 238 67 254 74 268L126 268C133 254 136 238 137 213C138 186 139 150 137 115C134 74 116 36 100 16Z" /></clipPath>
+      <clipPath id="rkt-fins"><path d="M64 186C50 196 38 218 33 258C32 266 38 268 44 263C52 257 61 255 71 259Z M136 186C150 196 162 218 167 258C168 266 162 268 156 263C148 257 139 255 129 259Z" /></clipPath>
+    </defs>
+  </svg>
+
+  <!-- smoke and launch pad stay on the ground -->
+  <svg class="rkt__ground" viewBox="0 0 200 400" focusable="false">
+    <g filter="url(#ink)">
+      <g class="rkt__smoke">
+        <g transform="translate(62 348) scale(1.0)"><path style="--s:2%" d="M-24 8C-32 8-34-4-26-7C-27-16-16-20-10-14C-7-23 7-24 10-15C17-21 28-15 25-6C33-3 31 9 23 9C14 12-14 12-24 8Z" /></g>
+        <g transform="translate(140 350) scale(0.95)"><path style="--s:6%" d="M-24 8C-32 8-34-4-26-7C-27-16-16-20-10-14C-7-23 7-24 10-15C17-21 28-15 25-6C33-3 31 9 23 9C14 12-14 12-24 8Z" /></g>
+        <g transform="translate(84 360) scale(1.25)"><path style="--s:10%" d="M-24 8C-32 8-34-4-26-7C-27-16-16-20-10-14C-7-23 7-24 10-15C17-21 28-15 25-6C33-3 31 9 23 9C14 12-14 12-24 8Z" /></g>
+        <g transform="translate(120 361) scale(1.3)"><path style="--s:14%" d="M-24 8C-32 8-34-4-26-7C-27-16-16-20-10-14C-7-23 7-24 10-15C17-21 28-15 25-6C33-3 31 9 23 9C14 12-14 12-24 8Z" /></g>
+        <g transform="translate(36 364) scale(0.8)"><path style="--s:20%" d="M-24 8C-32 8-34-4-26-7C-27-16-16-20-10-14C-7-23 7-24 10-15C17-21 28-15 25-6C33-3 31 9 23 9C14 12-14 12-24 8Z" /></g>
+        <g transform="translate(166 364) scale(0.8)"><path style="--s:24%" d="M-24 8C-32 8-34-4-26-7C-27-16-16-20-10-14C-7-23 7-24 10-15C17-21 28-15 25-6C33-3 31 9 23 9C14 12-14 12-24 8Z" /></g>
+        <g transform="translate(100 342) scale(0.9)"><path style="--s:30%" d="M-24 8C-32 8-34-4-26-7C-27-16-16-20-10-14C-7-23 7-24 10-15C17-21 28-15 25-6C33-3 31 9 23 9C14 12-14 12-24 8Z" /></g>
+      </g>
+      <path class="ink" style="--i:0" pathLength="1" d="M8 374C52 369 148 376 193 371" />
+      <path class="ink ink--thin" style="--i:1" pathLength="1" d="M22 378C40 376 56 378 70 377M130 378C146 376 164 379 180 377" />
+    </g>
+  </svg>
+
+  <div class="rkt__craft">
+    <svg class="rkt__body" viewBox="0 0 200 300" focusable="false">
+      <g filter="url(#ink)" fill="none">
+        <!-- fins, under the hull -->
+        <path class="fill" d="M64 186C50 196 38 218 33 258C32 266 38 268 44 263C52 257 61 255 71 259Z M136 186C150 196 162 218 167 258C168 266 162 268 156 263C148 257 139 255 129 259Z" />
+        <g clip-path="url(#rkt-fins)">
+          <path class="ink ink--hatch" style="--i:9" pathLength="1" d="M30 250L60 214M34 262L66 224M44 264L70 236M30 236L56 200M150 214L178 250M140 224L172 262M132 236L160 264M146 200L172 236" />
+        </g>
+        <path class="ink" style="--i:3" pathLength="1" d="M64 186C50 196 38 218 33 258C32 266 38 268 44 263C52 257 61 255 71 259" />
+        <path class="ink" style="--i:3" pathLength="1" d="M136 186C150 196 162 218 167 258C168 266 162 268 156 263C148 257 139 255 129 259" />
+
+        <!-- hull -->
+        <path class="fill" d="M100 16C84 36 66 74 63 116C61 150 62 186 63 214C64 238 67 254 74 268L126 268C133 254 136 238 137 213C138 186 139 150 137 115C134 74 116 36 100 16Z" />
+        <g clip-path="url(#rkt-hull)">
+          <path class="ink ink--hatch" style="--i:8" pathLength="1" d="M78 60L102 22M86 66L110 28M96 68L118 36M106 68L124 46M114 68L130 56M72 54L94 22" />
+        </g>
+        <path class="ink" style="--i:1" pathLength="1" d="M100 16C84 36 66 74 63 116C61 150 62 186 63 214C64 238 67 254 74 268L126 268C133 254 136 238 137 213C138 186 139 150 137 115C134 74 116 36 100 16" />
+        <!-- overdraw: the looser second pass a hand makes -->
+        <path class="ink ink--thin" style="--i:2" pathLength="1" d="M98 19C83 40 67 78 65 120C63 160 64 196 65 222C66 244 70 258 76 270" />
+        <path class="ink ink--thin" style="--i:2" pathLength="1" d="M102 17C117 39 133 78 135 118C137 158 136 196 135 224C134 244 131 257 124 270" />
+
+        <!-- nose band -->
+        <path class="ink" style="--i:4" pathLength="1" d="M74 64C88 70 112 70 126 63" />
+        <path class="ink ink--thin" style="--i:4" pathLength="1" d="M75 69C90 74 111 74 125 68" />
+
+        <!-- porthole -->
+        <path class="fill fill--glass" d="M100 109C112 108 120 117 119 128C119 140 111 148 100 147C88 147 81 139 81 128C81 117 89 109 100 109Z" />
+        <path class="ink" style="--i:5" pathLength="1" d="M100 109C112 108 120 117 119 128C119 140 111 148 100 147C88 147 81 139 81 128C81 117 89 109 101 110" />
+        <path class="ink ink--thin" style="--i:6" pathLength="1" d="M100 115C108 115 113 121 113 128C113 136 107 141 100 141C92 141 87 135 87 128C87 121 93 115 100 115" />
+        <path class="ink ink--thin" style="--i:7" pathLength="1" d="M93 123C94 120 97 118 101 118" />
+        <g class="dots"><circle cx="100" cy="103" r="1.5" /><circle cx="124" cy="128" r="1.5" /><circle cx="100" cy="153" r="1.5" /><circle cx="76" cy="128" r="1.5" /></g>
+
+        <!-- vents, panel seam, tail number -->
+        <path class="ink ink--thin" style="--i:7" pathLength="1" d="M110 170L120 169M110 177L120 176M110 184L118 183" />
+        <path class="ink" style="--i:6" pathLength="1" d="M64 206C86 212 114 212 136 205" />
+        <text class="rkt__mark" x="76" y="190">KL-1</text>
+
+        <!-- center fin, edge on -->
+        <path class="fill" d="M96 236C96 252 97 270 98 284C99 288 101 288 102 284C103 270 104 252 104 236Z" />
+        <path class="ink" style="--i:8" pathLength="1" d="M96 236C96 252 97 270 98 284C99 288 101 288 102 284C103 270 104 252 104 236" />
+
+        <!-- nozzle -->
+        <path class="fill" d="M80 268L74 290C90 293 110 293 126 290L120 268Z" />
+        <path class="ink" style="--i:9" pathLength="1" d="M80 268L74 290C90 293 110 293 126 290L120 268" />
+      </g>
+    </svg>
+
+    <svg class="rkt__flame" viewBox="0 0 200 160" focusable="false">
+      <g class="rkt__f rkt__f1" filter="url(#rkt-boil-1)">
+        <path class="flame-out" d="M76 2C68 30 78 58 88 80C90 70 94 92 100 120C104 96 108 76 112 84C124 58 132 30 124 2" />
+        <path class="flame-in" d="M88 2C84 22 92 42 100 64C108 42 116 22 112 2" />
+      </g>
+      <g class="rkt__f rkt__f2" filter="url(#rkt-boil-2)">
+        <path class="flame-out" d="M76 2C66 34 80 62 86 88C92 78 96 104 101 132C106 104 110 82 115 90C126 60 134 30 124 2" />
+        <path class="flame-in" d="M88 2C82 26 94 48 100 74C106 48 118 24 112 2" />
+      </g>
+      <g class="rkt__f rkt__f3" filter="url(#rkt-boil-3)">
+        <path class="flame-out" d="M76 2C70 26 74 54 90 74C92 66 97 86 99 112C103 90 108 72 110 78C122 54 130 28 124 2" />
+        <path class="flame-in" d="M88 2C86 20 92 36 100 56C108 36 114 20 112 2" />
+      </g>
+    </svg>
+  </div>
+
+  {label && (
+    <p class="rkt__label doodle">
+      <span>scroll to launch</span>
+      <svg viewBox="0 0 60 40" focusable="false"><path d="M4 6C18 4 34 10 42 24M42 24L44 12M42 24L31 21" /></svg>
+    </p>
+  )}
+</div>
+
+<style is:global>
+  /* ---------- layout ---------- */
+  .rkt{position:relative;width:clamp(170px,24vw,300px);aspect-ratio:200/400;flex:none}
+  .rkt svg{display:block;overflow:visible}
+  .rkt__defs{position:absolute}
+  .rkt__ground{position:absolute;inset:0;width:100%;height:100%}
+  .rkt__craft{position:absolute;inset:0;will-change:transform}
+  .rkt__body{position:absolute;top:0;left:0;width:100%;height:calc(300 / 400 * 100%)}
+  .rkt__flame{position:absolute;left:0;width:100%;top:calc(288 / 400 * 100%);height:calc(160 / 400 * 100%);transform-origin:50% 0;transform:scale(.8,.45)}
+
+  /* ---------- ink ---------- */
+  .rkt .ink{fill:none;stroke:var(--paper);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .rkt .ink--thin{stroke-width:1.2;opacity:.55}
+  .rkt .ink--hatch{stroke:var(--accent);stroke-width:1.6;opacity:.9}
+  .rkt .fill{fill:var(--space-2);stroke:none}
+  .rkt .fill--glass{fill:#22336a}
+  .rkt .dots{fill:var(--paper)}
+  .rkt__mark{font-family:var(--font-doodle);font-weight:600;font-size:15px;fill:var(--paper);opacity:.85}
+  .rkt__smoke path{fill:var(--space-2);stroke:var(--paper);stroke-width:1.6;opacity:0;transform-box:fill-box;transform-origin:center}
+  .flame-out{fill:rgba(255,138,61,.22);stroke:var(--accent);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+  .flame-in{fill:rgba(255,211,107,.28);stroke:var(--flame-core);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .rkt__f2,.rkt__f3{opacity:0}
+
+  .rkt__label{position:absolute;right:92%;top:56%;margin:0;display:flex;align-items:flex-end;gap:.15rem;font-size:1.4rem;line-height:1;color:var(--paper-soft);white-space:nowrap;transform:rotate(-6deg)}
+  .rkt__label svg{width:2.4rem;height:auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  :root:not([data-motion="on"]) .rkt__label{display:none}
+
+  /* ---------- motion, only when allowed ---------- */
+  :root[data-motion="on"] .rkt .ink{stroke-dasharray:1 1;animation:rkt-draw 1.1s cubic-bezier(.55,.1,.3,1) both;animation-delay:calc(var(--i,0) * 110ms)}
+  :root[data-motion="on"] .rkt .fill,
+  :root[data-motion="on"] .rkt .dots,
+  :root[data-motion="on"] .rkt__mark{animation:rkt-fade .6s ease-out 1.1s both}
+  :root[data-motion="on"] .rkt__flame{animation:rkt-ignite .5s ease-out 1.8s both}
+  :root[data-motion="on"] .rkt__f{animation:rkt-boil .3s steps(1,end) infinite}
+  :root[data-motion="on"] .rkt__f2{animation-delay:-.1s}
+  :root[data-motion="on"] .rkt__f3{animation-delay:-.2s}
+  :root[data-motion="on"] .rkt__label{animation:rkt-fade .6s ease-out 2.2s both}
+
+  @keyframes rkt-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+  @keyframes rkt-fade{from{opacity:0}}
+  @keyframes rkt-ignite{from{transform:scale(.3,0)}}
+  @keyframes rkt-boil{0%{opacity:1}33.333%{opacity:0}}
+  @keyframes rkt-launch{
+    0%{transform:translate3d(0,0,0)}
+    8%{transform:translate3d(-1px,-4px,0) rotate(-.6deg)}
+    14%{transform:translate3d(1px,-10px,0) rotate(.5deg)}
+    100%{transform:translate3d(0,-150vh,0) rotate(-2deg)}
+  }
+  @keyframes rkt-thrust{from{scale:1 1}to{scale:1.2 2.4}}
+  @keyframes rkt-puff{0%{opacity:0;transform:scale(.2)}25%{opacity:.9;transform:scale(.9)}100%{opacity:0;transform:scale(1.7) translateY(-12px)}}
+  @keyframes rkt-hide{to{opacity:0}}
+
+  /* Launch: native scroll-driven animations (Chrome, Edge, Safari 26+) */
+  @supports (animation-timeline: view()){
+    /* Longhands on purpose: the build minifier drops the shorthand when a timeline follows it. */
+    [data-launch-scope]{view-timeline-name:--launch;view-timeline-axis:block}
+    :root[data-motion="on"] .rkt__craft{animation-name:rkt-launch;animation-duration:auto;animation-fill-mode:both;animation-timing-function:cubic-bezier(.55,0,.85,.5);animation-timeline:--launch;animation-range-start:exit 0%;animation-range-end:exit 75%}
+    :root[data-motion="on"] .rkt__flame{animation-name:rkt-ignite,rkt-thrust;animation-duration:.5s,auto;animation-delay:1.8s,0s;animation-timing-function:ease-out,linear;animation-fill-mode:both;animation-timeline:auto,--launch;animation-range-start:normal,exit 0%;animation-range-end:normal,exit 35%}
+    :root[data-motion="on"] .rkt__smoke path{animation-name:rkt-puff;animation-duration:auto;animation-timing-function:linear;animation-fill-mode:both;animation-timeline:--launch;animation-range-start:exit var(--s);animation-range-end:exit calc(var(--s) + 45%)}
+    :root[data-motion="on"] .rkt__label{animation-name:rkt-fade,rkt-hide;animation-duration:.6s,auto;animation-delay:2.2s,0s;animation-timing-function:ease-out,linear;animation-fill-mode:both;animation-timeline:auto,--launch;animation-range-start:normal,exit 0%;animation-range-end:normal,exit 8%}
+  }
+
+  /* Launch: JS fallback (Firefox today). --p and --p2 come from scroll. */
+  :root[data-motion="on"] .rkt--js .rkt__craft{transform:translate3d(0,calc(var(--p2,0) * -150vh),0) rotate(calc(var(--p,0) * -2deg))}
+  :root[data-motion="on"] .rkt--js .rkt__flame{scale:calc(1 + min(var(--p,0) * 3, 1) * .2) calc(1 + min(var(--p,0) * 3, 1) * 1.4)}
+  :root[data-motion="on"] .rkt--js .rkt__smoke path{opacity:calc(min(var(--p,0) * 4, 1) * (1 - var(--p,0)) * .9);transform:scale(calc(.2 + var(--p,0) * 1.6))}
+  :root[data-motion="on"] .rkt--js .rkt__label{opacity:calc(1 - min(var(--p,0) * 12, 1))}
+
+  @media (max-width:47.99em){
+    .rkt{width:clamp(130px,36vw,190px)}
+    .rkt__label{display:none!important}
+  }
+</style>
+
+<script>
+  // Fallback for browsers without scroll-driven animations.
+  // The IntersectionObserver keeps the scroll listener off once the hero is out of view.
+  const rkt = document.querySelector<HTMLElement>("[data-rocket]");
+  const scope = rkt?.closest<HTMLElement>("[data-launch-scope]");
+  if (rkt && scope && !CSS.supports("animation-timeline: view()")) {
+    rkt.classList.add("rkt--js");
+    let queued = false;
+    let listening = false;
+    const set = (p: number) => {
+      rkt.style.setProperty("--p", p.toFixed(4));
+      rkt.style.setProperty("--p2", (p * p).toFixed(4));
+    };
+    const update = () => {
+      queued = false;
+      const r = scope.getBoundingClientRect();
+      const vh = window.innerHeight;
+      set(Math.min(1, Math.max(0, (vh - r.bottom) / (vh * 0.75))));
+    };
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    };
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !listening) {
+        listening = true;
+        window.addEventListener("scroll", onScroll, { passive: true });
+        update();
+      } else if (!entry.isIntersecting && listening) {
+        listening = false;
+        window.removeEventListener("scroll", onScroll);
+        set(entry.boundingClientRect.top < 0 ? 1 : 0);
+      }
+    }).observe(scope);
+  }
+</script>

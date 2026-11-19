@@ -1,0 +1,26 @@
+/* Design tokens. Change these and the whole site follows. */
+@font-face{font-family:"Hanken Grotesk";font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/hanken-grotesk-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Hanken Grotesk";font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/hanken-grotesk-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Hanken Grotesk";font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/hanken-grotesk-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:200 800;font-display:swap;src:url(/fonts/bricolage-grotesque-latin-wght-normal.woff2) format("woff2")}
+/* Doodle labels only. Subset to basic Latin. */
+@font-face{font-family:"Caveat";font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/caveat-600-subset.woff2) format("woff2")}
+
+:root{
+  --space:#0a0f1e;        /* page background */
+  --space-2:#111933;      /* raised surfaces */
+  --space-3:#2a365e;      /* hairlines on dark */
+  --paper:#f4efe2;        /* ink lines + body text */
+  --paper-soft:#b8bccb;   /* secondary text */
+  --accent:#ff8a3d;       /* links, CTAs, flame */
+  --accent-hot:#ffb27a;   /* hover */
+  --flame-core:#ffd36b;
+  --focus:#ffd36b;
+
+  --font-body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-display:"Bricolage Grotesque","Hanken Grotesk",system-ui,sans-serif;
+  --font-doodle:"Caveat","Segoe Print","Bradley Hand",cursive;
+
+  --wrapper-padding:4.5rem;
+  --header-h:4.5rem;
+}

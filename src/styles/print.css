@@ -1,0 +1,26 @@
+/* Print: match the PDF résumé. Black on white, one column, letter size,
+   no site chrome, no starfield, no rocket. */
+@media print{
+  @page{size:letter;margin:.5in .55in}
+  :root{color-scheme:light}
+  html,body{background:#fff none!important;color:#000!important}
+  .starfield,.ink-defs,.skip-link,.site-header,.site-footer,.resume-tools{display:none!important}
+  .content-wrapper{padding:0!important}
+  .content-well,.content-well-wide{max-width:none!important;padding:0!important}
+  :root .resume{background:#fff!important;color:#000!important;box-shadow:none!important;border-radius:0;padding:0!important;font-size:10pt;line-height:1.3}
+  :root .resume a{color:#000!important;text-decoration:none}
+  :root .resume__head h1{font-size:20pt}
+  :root .resume__headline,:root .resume__contact,:root .job__dates{color:#000!important}
+  :root .resume__contact{font-size:9pt;gap:0 .6rem}
+  :root .resume h2{font-size:10.5pt;margin-top:9pt;padding-bottom:2pt;border-bottom:1pt solid #000;break-after:avoid}
+  :root .job{margin-top:5pt;break-inside:auto}
+  :root .job h3,:root .job__dates{break-after:avoid}
+  :root .job li{break-inside:avoid}
+  :root .job ul{margin-top:2pt}
+  :root .resume section > p,:root .resume .line,:root .skills{margin-top:4pt}
+  :root .skills div + div{margin-top:2pt}
+  :root .job h3{font-size:10pt}
+  :root .job__dates{font-size:9pt}
+  :root .job li + li{margin-top:1pt}
+  :root .job__sep{color:#000!important}
+}

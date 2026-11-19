@@ -1,0 +1,60 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { CATEGORIES } from "../content.config";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+const { project } = Astro.props;
+const p = project.data;
+const statusLabel = { live: "Live", beta: "Beta", "in-development": "In development" } as const;
+const host = new URL(p.url).hostname.replace(/^www\./, "");
+const headingId = `proj-${project.id}`;
+---
+<li class="pcard flex-col sm-12 md-6 lg-4" data-categories={p.categories.join(" ")}>
+  <article aria-labelledby={headingId}>
+    <div class="pcard__top">
+      <p class="pcard__cats">{p.categories.map((c) => CATEGORIES[c]).join(" · ")}</p>
+      {p.status && (
+        <p class={`pcard__status pcard__status--${p.status}`}>
+          <span class="visually-hidden">Status: </span>{statusLabel[p.status]}
+        </p>
+      )}
+    </div>
+    <h3 id={headingId}>
+      <a href={p.url} target="_blank" rel="noopener">{p.name}<span class="visually-hidden"> (opens in a new tab)</span></a>
+    </h3>
+    <p class="pcard__desc">{p.description}</p>
+    {p.tags.length > 0 && (
+      <ul class="pcard__tags" aria-label={`${p.name} tech`}>
+        {p.tags.map((t) => <li>{t}</li>)}
+      </ul>
+    )}
+    <p class="pcard__go" aria-hidden="true">{host} ↗</p>
+  </article>
+</li>
+
+<style is:global>
+  .pcard{list-style:none;display:flex}
+  .pcard[hidden]{display:none}
+  .pcard article{position:relative;display:flex;flex-direction:column;width:100%;padding:1.6rem;background:rgba(17,25,51,.78);border:1px solid var(--space-3);border-radius:14px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+  .pcard article:hover,.pcard article:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 18px 40px -20px rgba(255,138,61,.45)}
+  :root[data-motion="on"] .pcard article:hover{transform:translateY(-3px)}
+  .pcard__top{display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap}
+  .pcard__cats{margin:0;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.11em;color:var(--paper-soft)}
+  .pcard__status{margin:0;display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;border:1px solid currentColor}
+  .pcard__status::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:currentColor}
+  .pcard__status--live{color:#7fe3a6}
+  .pcard__status--beta{color:var(--flame-core)}
+  .pcard__status--in-development{color:#a9bcff}
+  .pcard h3{font-size:1.6rem;font-weight:800;margin-top:.9rem}
+  .pcard h3 a{color:var(--paper);text-decoration:none}
+  /* Whole card is clickable; the heading link is the only tab stop. */
+  .pcard h3 a::after{content:"";position:absolute;inset:0;border-radius:14px}
+  .pcard h3 a:focus-visible{outline:none}
+  .pcard article:has(h3 a:focus-visible){outline:3px solid var(--focus);outline-offset:3px}
+  .pcard__desc{margin-top:.7rem;color:var(--paper-soft)}
+  .pcard__tags{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.2rem 0 0;padding:0;list-style:none}
+  .pcard__tags li{font-size:.75rem;font-weight:600;padding:.2rem .55rem;border-radius:6px;background:rgba(244,239,226,.06);border:1px solid var(--space-3);color:var(--paper)}
+  .pcard__go{margin-top:auto;padding-top:1.2rem;font-weight:700;font-size:.9rem;color:var(--accent)}
+</style>

@@ -1,0 +1,61 @@
+---
+// Filter buttons for the project grid. Without JavaScript every project shows
+// and the buttons stay hidden, so nothing is lost.
+import { CATEGORIES } from "../content.config";
+
+interface Props {
+  target: string; // id of the <ul> holding the cards
+  counts: Record<string, number>;
+  total: number;
+}
+const { target, counts, total } = Astro.props;
+const filters = [{ key: "all", label: "All", n: total }, ...Object.entries(CATEGORIES).map(([key, label]) => ({ key, label, n: counts[key] ?? 0 }))];
+---
+<div class="pfilter" data-filter={target} hidden>
+  <p class="visually-hidden" id={`${target}-label`}>Filter projects</p>
+  <ul class="pfilter__list" role="list" aria-labelledby={`${target}-label`}>
+    {filters.map((f) => (
+      <li>
+        <button type="button" data-key={f.key} aria-pressed={f.key === "all" ? "true" : "false"}>
+          {f.label} <span class="pfilter__n" aria-hidden="true">{f.n}</span>
+        </button>
+      </li>
+    ))}
+  </ul>
+  <p class="visually-hidden" role="status" aria-live="polite" data-filter-status></p>
+</div>
+
+<style is:global>
+  .pfilter[hidden]{display:none}
+  .pfilter__list{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;margin:0 0 2rem;padding:0}
+  .pfilter button{display:inline-flex;align-items:center;gap:.45rem;min-height:2.75rem;padding:.45rem 1rem;border-radius:999px;border:1.5px solid var(--space-3);background:transparent;color:var(--paper);font:inherit;font-weight:600;font-size:.92rem;cursor:pointer}
+  .pfilter button:hover{border-color:var(--accent);color:var(--accent-hot)}
+  .pfilter button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--space)}
+  .pfilter__n{font-size:.78rem;opacity:.75}
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-filter]").forEach((wrap) => {
+    const grid = document.getElementById(wrap.dataset.filter!);
+    if (!grid) return;
+    const buttons = wrap.querySelectorAll<HTMLButtonElement>("button[data-key]");
+    const status = wrap.querySelector<HTMLElement>("[data-filter-status]")!;
+    const cards = grid.querySelectorAll<HTMLElement>("[data-categories]");
+    wrap.hidden = false;
+
+    buttons.forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const key = btn.dataset.key!;
+        let shown = 0;
+        cards.forEach((card) => {
+          const match = key === "all" || card.dataset.categories!.split(" ").includes(key);
+          card.hidden = !match;
+          if (match) shown++;
+        });
+        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+        const label = btn.firstChild?.textContent?.trim() ?? "";
+        status.textContent = `Showing ${shown} ${shown === 1 ? "project" : "projects"}${key === "all" ? "" : ` in ${label}`}.`;
+      }),
+    );
+  });
+</script>
