@@ -22,6 +22,7 @@ September 2023 – Present
 - Leads full-cycle web development across a portfolio of pharmaceutical and healthcare clients, collaborating with cross-functional teams (design, strategy, analytics) to build and optimize responsive sites and applications.
 - Helps define the technical architecture strategy, covering stack selection, build tooling, and deployment pipelines (Azure, WP Engine), prioritizing performance, scalability, maintainability, and WCAG accessibility compliance.
 - Implements Git-based CI/CD workflows and automation (Webpack, Gulp, Grunt) to standardize development processes across engagements.
+- Uses AI-assisted development (OpenAI Codex and Claude, with custom agent skills) to plan, build, and review code, with human review on every change.
 - Key projects: [belotero.com](https://belotero.com), [kengreal.com](https://kengreal.com), [xeominaesthetic.com](https://xeominaesthetic.com)
 
 ### Highspot | Remote | Marketing Web Developer
@@ -65,6 +66,7 @@ October 2013 – June 2014
 2024 – Present
 
 - Building a portfolio of independent web and mobile products and consulting projects, including headless WordPress implementations using Astro and Next.js, static sites (Hugo, 11ty), WordPress sites and plugins, and a full-stack mobile application using React Native, Fastify, Supabase, and Twilio.
+- Builds with Claude Code and custom agent skills to plan, build, and test production sites and apps, with human review on every change.
 - Key projects: [bucsbounty.com](https://bucsbounty.com), [theknuckle.com](https://theknuckle.com), [channahonrental.com](https://channahonrental.com), [paidforpolitics.com](https://paidforpolitics.com)
 
 ### Laverty Creative LLC | Apex, NC | Freelance Full Stack Developer
@@ -86,6 +88,8 @@ July 2015 – 2019
 **Tooling & DevOps:** Git, GitHub Actions, CI/CD, Webpack, Vite, Gulp, Jira, Cloudflare, Sentry, PagerDuty
 
 **Backend & APIs:** Fastify, Express, Supabase, Prisma, Twilio, Postmark, REST APIs
+
+**AI-Assisted Development:** Claude Code, OpenAI Codex, custom agent skills, AI-assisted code review
 
 ## Education
 
