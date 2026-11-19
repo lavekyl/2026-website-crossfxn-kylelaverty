@@ -23,7 +23,7 @@ const {
 } = Astro.props;
 const canonical = new URL(path, Astro.site).href;
 // Bump ?v= whenever og-image.png changes, so social platforms fetch the new one.
-const ogImage = new URL("/og-image.png?v=2", Astro.site).href;
+const ogImage = new URL("/og-image.png?v=3", Astro.site).href;
 const GA_ID = "G-BHJXKZHLZX";
 
 const jsonLd = {
