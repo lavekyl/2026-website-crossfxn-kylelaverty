@@ -4,7 +4,19 @@ The source for [kylelaverty.com](https://kylelaverty.com). A portfolio and résu
 
 ## Run it
 
-Astro 7 needs Node 22.23.4 or newer (`.nvmrc` pins it).
+Astro 7 needs Node 22.23.4 or newer. The repo pins that version in three places, and they should always match:
+
+- `package.json` has a `volta` block, so [Volta](https://volta.sh) switches to the pinned Node inside this folder.
+- `.nvmrc`, for nvm users (`nvm use`).
+- `NODE_VERSION` in `netlify.toml`, for production builds.
+
+If `astro dev` says your Node version isn't supported, your default Node is older than the pin. With Volta:
+
+```
+volta install node@22
+```
+
+To change the pinned version, run `volta pin node@<version>`, then update `.nvmrc` and `netlify.toml` to match.
 
 ```
 npm install
